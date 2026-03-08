@@ -15,11 +15,11 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 
 SUBREGIONS = {
-    "SEA":           {"countries": ["SG", "ID", "MY", "TH", "PH", "VN"], "n_accounts": 1500, "n_reps": 6},
-    "Greater China": {"countries": ["CN", "HK", "TW"],                   "n_accounts": 1200, "n_reps": 4},
-    "North Asia":    {"countries": ["JP", "KR"],                          "n_accounts": 1000, "n_reps": 3},
-    "India":         {"countries": ["IN"],                                 "n_accounts": 800,  "n_reps": 3},
-    "ANZ":           {"countries": ["AU", "NZ"],                          "n_accounts": 500,  "n_reps": 2},
+    "SEA":           {"countries": ["SG", "ID", "MY", "TH", "PH", "VN"], "n_accounts": 600, "n_reps": 6},
+    "Greater China": {"countries": ["CN", "HK", "TW"],                   "n_accounts": 480, "n_reps": 4},
+    "North Asia":    {"countries": ["JP", "KR"],                          "n_accounts": 400, "n_reps": 3},
+    "India":         {"countries": ["IN"],                                 "n_accounts": 320, "n_reps": 3},
+    "ANZ":           {"countries": ["AU", "NZ"],                          "n_accounts": 200, "n_reps": 2},
 }
 
 INDUSTRIES = ["SaaS", "Fintech", "E-commerce", "Healthcare", "Manufacturing",
@@ -149,17 +149,27 @@ def make_assignments(accounts, reps):
 
     rep_lookup = reps[reps["subregion"] != "Regional"].copy()
 
+    # Assign each rep a random target load between 60-95% of max_accounts
+    rep_targets = {
+        rep_id: int(
+            rep_lookup.loc[rep_lookup["rep_id"] == rep_id, "max_accounts"].values[0]
+            * random.uniform(0.88, 0.98)
+        )
+        for rep_id in rep_lookup["rep_id"]
+    }
+    rep_counts = {rep_id: 0 for rep_id in rep_lookup["rep_id"]}
+
     # Whitespace config: % of accounts LEFT UNASSIGNED per subregion
     whitespace_rates = {
-        "SEA": 0.10,
-        "Greater China": 0.25,  # large CN Enterprise untouched
-        "North Asia": 0.05,
-        "India": 0.30,           # SMB never contacted
-        "ANZ": 0.03,
+        "SEA":           0.05,
+        "Greater China": 0.15,
+        "North Asia":    0.03,
+        "India":         0.20,
+        "ANZ":           0.02,
     }
 
     for subregion, grp in accounts.groupby("subregion"):
-        sub_reps = rep_lookup[rep_lookup["subregion"] == subregion]
+        sub_reps = rep_lookup[rep_lookup["subregion"] == subregion].copy()
         ws_rate = whitespace_rates.get(subregion, 0.10)
 
         for _, acc in grp.iterrows():
@@ -170,34 +180,52 @@ def make_assignments(accounts, reps):
                 last_activity_date = None
                 engagement_status = "No Coverage"
             else:
-                rep = sub_reps.sample(1).iloc[0]
-                rep_id = int(rep["rep_id"])
-                assigned_date = fake.date_between(start_date=date(2022, 1, 1), end_date=date(2024, 6, 30))
+                # Filter to reps with remaining capacity
+                available_reps = sub_reps[
+                    sub_reps["rep_id"].apply(lambda x: rep_counts[x] < rep_targets[x])
+                ]
 
-                # India SMB: assigned but never touched
-                if subregion == "India" and acc["segment"] == "SMB" and random.random() < 0.45:
+                # If no reps have capacity, mark as unassigned
+                if available_reps.empty:
+                    coverage_status = "Unassigned"
+                    rep_id = None
+                    assigned_date = None
                     last_activity_date = None
-                    engagement_status = "Stale"
-                    coverage_status = "Assigned"
+                    engagement_status = "No Coverage"
                 else:
-                    last_activity_date = fake.date_between(start_date=assigned_date, end_date=date(2025, 3, 1))
-                    days_since = (date(2025, 3, 1) - last_activity_date).days
-                    if days_since < 30:
-                        engagement_status = "Active"
-                    elif days_since < 90:
-                        engagement_status = "Warm"
-                    else:
+                    rep = available_reps.sample(1).iloc[0]
+                    rep_id = int(rep["rep_id"])
+                    rep_counts[rep_id] += 1
+                    assigned_date = fake.date_between(
+                        start_date=date(2022, 1, 1), end_date=date(2024, 6, 30)
+                    )
+
+                    # India SMB: assigned but never touched
+                    if subregion == "India" and acc["segment"] == "SMB" and random.random() < 0.45:
+                        last_activity_date = None
                         engagement_status = "Stale"
-                    coverage_status = "Assigned"
+                        coverage_status = "Assigned"
+                    else:
+                        last_activity_date = fake.date_between(
+                            start_date=assigned_date, end_date=date(2025, 3, 1)
+                        )
+                        days_since = (date(2025, 3, 1) - last_activity_date).days
+                        if days_since < 30:
+                            engagement_status = "Active"
+                        elif days_since < 90:
+                            engagement_status = "Warm"
+                        else:
+                            engagement_status = "Stale"
+                        coverage_status = "Assigned"
 
             rows.append({
-                "assignment_id":     assignment_id,
-                "account_id":        int(acc["account_id"]),
-                "rep_id":            rep_id,
-                "assigned_date":     assigned_date,
-                "coverage_status":   coverage_status,
+                "assignment_id":      assignment_id,
+                "account_id":         int(acc["account_id"]),
+                "rep_id":             rep_id,
+                "assigned_date":      assigned_date,
+                "coverage_status":    coverage_status,
                 "last_activity_date": last_activity_date,
-                "engagement_status": engagement_status,
+                "engagement_status":  engagement_status,
             })
             assignment_id += 1
 
