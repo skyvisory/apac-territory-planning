@@ -301,7 +301,7 @@ def make_customers(accounts, assignments):
         if acc["account_id"] in assigned.index:
             rep_id = int(assigned.loc[acc["account_id"], "rep_id"])
 
-        contract_start = fake.date_between(start_date=date(2021, 1, 1), end_date=date(2024, 1, 1))
+        contract_start = fake.date_between(start_date=date(2023, 1, 1), end_date=date(2025, 1, 1))
         contract_end = contract_start + timedelta(days=random.choice([365, 730]))
         renewal_flag = int(contract_end > date(2025, 3, 1))
 
