@@ -225,10 +225,10 @@ def make_opportunities(accounts, assignments):
             created_date = fake.date_between(start_date=date(2023, 1, 1), end_date=date(2025, 1, 1))
             close_date = created_date + timedelta(days=random.randint(30, 180))
 
-            stage = random.choices(STAGES, weights=[0.15, 0.20, 0.20, 0.15, 0.10, 0.12, 0.08])[0]
+            stage = random.choices(STAGES, weights=[0.25, 0.22, 0.18, 0.13, 0.07, 0.05, 0.10])[0]
             win_flag = 1 if stage == "Closed Won" else (0 if stage == "Closed Lost" else None)
 
-            arr_potential = round(acc["estimated_arr"] * random.uniform(0.6, 1.2), -2)
+            arr_potential = round(acc["estimated_arr"] * random.uniform(0.08, 0.20), -2)
 
             rows.append({
                 "opportunity_id": opp_id,
@@ -280,7 +280,7 @@ def make_customers(accounts, assignments):
         subregion = acc["subregion"]
         nrr_band = random.choices(nrr_bands_by_subregion[subregion], weights=nrr_weights[subregion])[0]
 
-        arr = round(acc["estimated_arr"] * random.uniform(0.8, 1.1), -2)
+        arr = round(acc["estimated_arr"] * random.uniform(0.05, 0.15), -2)
 
         rows.append({
             "customer_id":     customer_id,

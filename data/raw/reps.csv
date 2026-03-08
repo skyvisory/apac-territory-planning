@@ -1,21 +1,21 @@
 rep_id,rep_name,subregion,segment_focus,quota_usd,max_accounts
-1,Johnny Woods,SEA,Mid-Market,700000.0,80
-2,Theresa Hall,SEA,SMB,400000.0,150
-3,Brian Shannon,SEA,Enterprise,1200000.0,40
-4,David Mitchell,SEA,Enterprise,1200000.0,40
-5,Barbara Patterson,SEA,SMB,400000.0,150
-6,Mark Smith,SEA,Mid-Market,700000.0,80
-7,Nicholas Adkins,Greater China,SMB,400000.0,150
-8,Caitlin Alvarado,Greater China,Mid-Market,700000.0,80
-9,Julie Cole,Greater China,Mid-Market,700000.0,80
-10,Kenneth Edwards,Greater China,Mid-Market,700000.0,80
-11,Kiara Bell,North Asia,Enterprise,1440000.0,40
-12,Douglas Young,North Asia,Enterprise,1432000.0,40
-13,Christopher Carter,North Asia,Mid-Market,809000.0,80
-14,Ricky Lopez,India,SMB,400000.0,150
-15,Sarah Gray,India,SMB,400000.0,150
-16,Robert Butler,India,Mid-Market,700000.0,80
-17,Raven Fuller,ANZ,Enterprise,1200000.0,40
-18,Sandy Taylor,ANZ,Enterprise,1200000.0,40
-19,Jose Velasquez,Regional,Enterprise,1500000.0,25
-20,Steven Roberts,Regional,Enterprise,1500000.0,25
+1,Whitney Anderson,SEA,Mid-Market,700000.0,80
+2,Donald Murphy,SEA,SMB,400000.0,150
+3,Monique Alvarez,SEA,Enterprise,1200000.0,40
+4,Edward Bailey,SEA,Enterprise,1200000.0,40
+5,Kristen Martinez,SEA,SMB,400000.0,150
+6,Jeffrey Long,SEA,Mid-Market,700000.0,80
+7,Shannon Gilmore,Greater China,SMB,400000.0,150
+8,Christine Pineda,Greater China,Mid-Market,700000.0,80
+9,Jennifer Brooks,Greater China,Mid-Market,700000.0,80
+10,Kevin Young,Greater China,Mid-Market,700000.0,80
+11,Sarah Williams,North Asia,Enterprise,1440000.0,40
+12,Sharon Marshall,North Asia,Enterprise,1432000.0,40
+13,Kyle Swanson,North Asia,Mid-Market,809000.0,80
+14,Jessica Monroe,India,SMB,400000.0,150
+15,Cindy Li,India,SMB,400000.0,150
+16,Anthony Key,India,Mid-Market,700000.0,80
+17,Toni Ortiz,ANZ,Enterprise,1200000.0,40
+18,William Carpenter,ANZ,Enterprise,1200000.0,40
+19,Andrew Salazar,Regional,Enterprise,1500000.0,25
+20,Mckenzie Graves,Regional,Enterprise,1500000.0,25
