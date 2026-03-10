@@ -1,8 +1,10 @@
 # APAC Territory Planning
+**Optimising sales territory design and uncovering $521M in whitespace ARR across APAC**
 
-**Role:** Revenue Operations Analyst  
-**Stack:** Python · DuckDB · pandas · scikit-learn · Plotly  
-**Data:** Synthetic · 2,000 accounts · 20 reps · 5 APAC subregions
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![DuckDB](https://img.shields.io/badge/DuckDB-1.0-yellow)
+![scikit--learn](https://img.shields.io/badge/scikit--learn-1.6-orange)
+![Plotly](https://img.shields.io/badge/Plotly-5.0-purple)
 
 ---
 
@@ -78,6 +80,7 @@ Quota attainment, pipeline coverage ratio, and win rate by rep and subregion usi
 Identifies 1,398 unworked accounts representing $521M ARR. K-means clustering (k=3, elbow method validated) segments whitespace into priority tiers. 300 priority accounts flagged for direct AE ownership.
 
 ![Penetration Rate](outputs/03_penetration_rate.png)
+
 ![K-Means Scatter](outputs/03_kmeans_scatter.png)
 ![Whitespace Tiers](outputs/03_whitespace_tiers.png)
 
