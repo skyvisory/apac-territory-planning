@@ -3,54 +3,39 @@
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![DuckDB](https://img.shields.io/badge/DuckDB-1.0-yellow)
-![scikit--learn](https://img.shields.io/badge/scikit--learn-1.6-orange)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.6-orange)
 ![Plotly](https://img.shields.io/badge/Plotly-5.0-purple)
 
 ---
 
-## Portfolio Context
+## Business Problem
 
-This is the fourth project in a RevOps analytics portfolio:
+APAC sales leadership suspected territories were unbalanced but lacked data to act. With 20 reps covering 2,000 accounts across 5 subregions, the question was whether the problem was headcount, coverage design, or both. $521M in estimated ARR sat in accounts that had never been contacted. Without a structured coverage model, high-value Enterprise accounts were being managed by SMB reps while India reps operated at 54% capacity with the lowest attainment in the region.
 
-| Project | Objective | Key Technique |
+---
+
+## Key Results
+
+| Finding | Detail | Business Impact |
 |---|---|---|
-| 1 · Customer Churn | Predict churn → save revenue | XGBoost, feature importance |
-| 2 · Sales Pipeline | Visualise pipeline → close revenue | SQL window functions, Streamlit |
-| 3 · SaaS Expansion | Predict expansion → grow revenue | Logistic regression, SHAP |
-| **4 · Territory Planning** | **Plan territories → allocate resources** | **K-means, Gini coefficient** |
+| Territory ARR is unequal | Gini 0.339 — SMB reps hold $48-77M ARR, Enterprise reps only $11-13M | Coverage design problem, not headcount |
+| Load is well balanced | Gini 0.071 — reps have similar account counts | Structural imbalance, not effort |
+| $521M whitespace ARR untouched | <3.2% TAM penetration in any subregion | Largest growth lever in APAC |
+| 300 priority accounts identified | Avg ARR $1.3M — Tier 1 Enterprise whitespace | Immediate AE direct coverage |
+| 234 accounts mismatched | Enterprise accounts assigned to SMB reps | Reassignment list produced |
+| India under-penetrated | 54-62% load, 6-16% attainment, $16K avg ARR | Different playbook needed |
+| Greater China biggest opportunity | 124 Tier 1 accounts, $146M ARR potential | 1 Enterprise hire unlocks $795K |
+| Total revenue impact | 7 recommendations across new hires, BDR, nurture | **$4.2M estimated ARR** |
 
 ---
 
-## Business Questions
+## Key Output
 
-1. Are APAC territories balanced by opportunity?
-2. Which reps are over or under capacity?
-3. Where is the whitespace — unassigned or never-touched accounts?
-4. How should territories be realigned for next year?
-5. What is the revenue impact of rebalancing?
+**Territory Rebalancing Scorecard** — 234 accounts flagged for reassignment from SMB to Enterprise reps, with recommended rep by subregion. India Enterprise accounts routed to regional overlay reps.
 
----
+**Whitespace Priority List** — 1,398 unworked accounts tiered into Tier 1 (direct AE), Tier 2 (BDR sequencing), and Tier 3 (marketing nurture). Top 300 Tier 1 accounts flagged as Priority with $397M combined ARR potential.
 
-## Key Findings
-
-**Territory design is the problem, not headcount.**
-Rep load is well distributed (Gini 0.071) but revenue opportunity is not (Gini 0.339). SMB reps hold $48-77M in territory ARR while Enterprise reps hold only $11-13M. Reps are working hard in the wrong places.
-
-**$521M in whitespace ARR sits untouched.**
-Less than 3.2% of TAM has been converted in any subregion. 300 priority accounts with avg ARR of $1.3M have been identified for immediate AE direct coverage.
-
-**Greater China is the biggest single opportunity.**
-124 Tier 1 Enterprise accounts, $146M ARR potential — largely untouched with only 4 reps covering 480 accounts.
-
-**India needs a different playbook.**
-India reps are at 54-62% capacity but have the lowest attainment in APAC (6-16%). The market is SMB-heavy with $16K avg ARR — direct rep coverage is not cost-effective.
-
-**Total estimated revenue impact: $4.2M**
-Across 7 prioritised recommendations spanning new hires, overlay deployment, BDR sequencing, and rep redeployment.
-
----
-
-## Recommended Actions
+**Prioritised Action Plan**
 
 | Priority | Action | Impact | Timeframe |
 |---|---|---|---|
@@ -65,71 +50,84 @@ Across 7 prioritised recommendations spanning new hires, overlay deployment, BDR
 
 ---
 
-## Notebook Walkthrough
+## Analytical Approach
 
-### 01 · Data Profiling
-Schema validation, null checks, and distribution analysis across 5 tables. Establishes baseline coverage rates, rep capacity, and engagement status by subregion.
+**Coverage analysis first.** Before any modelling, the territory universe was mapped — 2,000 accounts, 20 reps, 5 subregions — to establish baseline penetration rates, rep load, and engagement status. This revealed that ANZ and North Asia had 45% whitespace not because of low priority but because rep capacity simply could not cover the account universe.
 
-### 02 · Territory Performance
-Quota attainment, pipeline coverage ratio, and win rate by rep and subregion using DuckDB SQL. Choropleth maps of customer ARR and open pipeline by country.
+**Gini coefficient to diagnose the imbalance.** Rather than eyeballing rep performance, the Gini coefficient was used to separate two distinct problems: load distribution (how many accounts each rep carries) vs ARR opportunity distribution (the revenue potential of those accounts). Load Gini of 0.071 confirmed reps were equally utilised. ARR Gini of 0.339 confirmed the opportunity was not equally distributed. The Lorenz curve made this gap visual for executive communication.
 
-![Quota Attainment](outputs/02_quota_attainment.png)
-![ARR by Country](outputs/02_arr_by_country.png)
+**K-means clustering to prioritise whitespace.** With 1,398 unworked accounts and finite rep capacity, not all whitespace is equal. K-means (k=3, validated by elbow method) segmented accounts by estimated ARR, employee band, and segment into three actionable tiers — each mapped to a distinct coverage motion: direct AE, BDR sequencing, or marketing nurture.
 
-### 03 · Whitespace Analysis
-Identifies 1,398 unworked accounts representing $521M ARR. K-means clustering (k=3, elbow method validated) segments whitespace into priority tiers. 300 priority accounts flagged for direct AE ownership.
-
-![Penetration Rate](outputs/03_penetration_rate.png)
-
-![K-Means Scatter](outputs/03_kmeans_scatter.png)
-![Whitespace Tiers](outputs/03_whitespace_tiers.png)
-
-### 04 · Territory Balancing
-Gini coefficient analysis reveals load is equal (0.071) but ARR opportunity is not (0.339). Lorenz curve visualises the structural imbalance. Rebalancing simulation identifies 67 excess accounts and 234 mismatched accounts for reassignment.
-
-![Lorenz Curve](outputs/04_lorenz_curve.png)
-![Territory Rebalancing](outputs/04_territory_rebalancing.png)
-
-### 05 · Recommendations
-Prioritised action plan with data-driven revenue impact estimates. Conversion rates applied by coverage motion (direct rep, BDR, marketing nurture) based on observed data and B2B SaaS benchmarks. Executive memo for APAC sales leadership.
-
-![Revenue Impact](outputs/05_revenue_impact.png)
-
-### 06 · SQL Analysis
-All key metrics reproduced in pure SQL using chained CTEs — quota attainment, pipeline coverage, win rate, whitespace tiers — demonstrating full reproducibility without pandas transformations.
+**Revenue impact modelling with conversion rate assumptions.** Recommendations were translated into estimated ARR using observed conversion rates from the dataset, adjusted by coverage motion based on B2B SaaS benchmarks. Assumptions are fully documented and conservative — actual rates should be validated against historical CRM data before use in planning.
 
 ---
 
-## Tech Stack
+## Technical Decisions
 
-| Tool | Usage |
+**K-means over rule-based tiering.** A rule-based approach (e.g. ARR > $500K = Tier 1) would require arbitrary thresholds. K-means discovers natural groupings from the data and produces globally consistent tiers — Priority accounts average $1.3-1.4M ARR across all subregions, confirming the clustering is meaningful.
+
+**Active customer filter applied consistently.** 131 churned or expired customers were excluded across all notebooks. All metrics reflect current active revenue only — historical outcomes are not counted as performance.
+
+**Gini implemented manually.** scipy.stats has no Gini function. The coefficient was implemented from first principles using the cumulative distribution formula, then validated against the Lorenz curve visually.
+
+**Randomly assigned recommended reps with documented caveat.** The rebalancing list identifies which accounts need to move, not who they should go to — that is a judgment call for the sales manager. Random assignment within subregion was used as a placeholder with a clear note in the output.
+
+**DuckDB in-memory throughout.** No persistent database files — all SQL runs on DataFrames registered at notebook startup. All queries saved to `sql/` as single source of truth.
+
+---
+
+## Notebooks
+
+| Notebook | Description |
 |---|---|
-| Python 3.11 | Core analysis |
-| DuckDB | In-memory SQL engine |
-| pandas | Data wrangling |
-| scikit-learn | K-means clustering, StandardScaler |
-| Plotly | All charts and maps |
-| scipy / numpy | Gini coefficient calculation |
-| Faker | Synthetic data generation |
-| Jupyter | Notebooks |
-| Git | Version control |
+| 01 · Data Profiling | Schema validation, null checks, coverage rates, rep capacity by subregion |
+| 02 · Territory Performance | Quota attainment, pipeline coverage, win rate, choropleth maps by country |
+| 03 · Whitespace Analysis | Penetration rate, K-means clustering, priority tier assignment |
+| 04 · Territory Balancing | Gini coefficient, Lorenz curve, rebalancing simulation, reassignment list |
+| 05 · Recommendations | Revenue impact model, prioritised actions, executive memo, KPIs |
+| 06 · SQL Analysis | All key metrics reproduced in pure SQL using chained CTEs |
 
 ---
 
-## Domain Concepts Applied
+## Outputs
 
-| Concept | Definition | Used In |
+| File | Description |
+|---|---|
+| `outputs/02_quota_attainment.png` | Quota attainment % by rep, sorted descending |
+| `outputs/02_arr_by_country.png` | Customer ARR by country — choropleth map |
+| `outputs/02_pipeline_by_country.png` | Open pipeline by country — choropleth map |
+| `outputs/03_penetration_rate.png` | TAM penetration rate by subregion |
+| `outputs/03_elbow_method.png` | K-means elbow chart — inertia vs k |
+| `outputs/03_kmeans_scatter.png` | Cluster scatter plot — ARR vs employee band |
+| `outputs/03_whitespace_tiers.png` | Whitespace account count by tier and subregion |
+| `outputs/04_lorenz_curve.png` | Lorenz curve — load % vs territory ARR |
+| `outputs/04_territory_rebalancing.png` | Before vs after load % by rep |
+| `outputs/05_revenue_impact.png` | Estimated ARR impact by recommendation |
+| `data/processed/rebalancing_list.csv` | 234 accounts flagged for reassignment with recommended rep |
+| `data/processed/whitespace_scored.csv` | 1,398 whitespace accounts with tier and priority flag |
+
+---
+
+## KPIs to Track
+
+| Frequency | Metric | Target |
 |---|---|---|
-| TAM | Total addressable market — revenue if all accounts converted | Notebook 03 |
-| Penetration Rate | Current ARR / TAM × 100 | Notebook 03 |
-| Whitespace | Unassigned or never-touched accounts | Notebooks 03-04 |
-| Gini Coefficient | 0 = equal distribution, 1 = completely unequal | Notebook 04 |
-| Lorenz Curve | Visual representation of Gini inequality | Notebook 04 |
-| Coverage Ratio | Accounts assigned / rep capacity | Notebooks 01, 04 |
-| Quota Attainment | Actual ARR / quota × 100 | Notebook 02 |
-| Pipeline Coverage | Open pipeline / quota | Notebook 02 |
-| K-means Clustering | Unsupervised ML — groups accounts into priority tiers | Notebook 03 |
-| Elbow Method | Validates optimal number of clusters | Notebook 03 |
+| Weekly | Pipeline ARR by subregion | Whitespace outreach generating opportunities |
+| Weekly | New accounts contacted from priority list | Reps working Tier 1 accounts |
+| Monthly | Rep load % by subregion | Flag <70% or >95% |
+| Monthly | Whitespace conversion rate — priority accounts | Tier 1 → pipeline → customer progression |
+| Monthly | Territory ARR Gini | Improving toward <0.25 |
+| Monthly | Quota attainment by rep and segment | Flag reps below 50% for coaching |
+| Quarterly | Penetration rate by subregion | Increasing TAM capture over time |
+| Quarterly | Tier 1 account progression | Whitespace → pipeline → customer funnel |
+| Quarterly | Territory rebalancing review | Assignments still reflect account value |
+| Quarterly | India coverage model effectiveness | BDR + marketing outperforming direct rep baseline |
+
+---
+
+## Stack
+
+Python 3.11 · DuckDB · pandas · scikit-learn · scipy · Plotly · Faker · Jupyter
 
 ---
 
@@ -164,6 +162,7 @@ notebooks/06_sql_analysis.ipynb
 ---
 
 ## Project Structure
+
 ```
 apac-territory-planning/
 ├── data/
@@ -178,4 +177,19 @@ apac-territory-planning/
 
 ---
 
-*Built as part of a RevOps / data analyst portfolio. Synthetic data only — no real company information.*
+## Portfolio Context
+
+This is the fourth project in a RevOps analytics portfolio, each building a distinct capability across the revenue lifecycle:
+
+| Project | Objective | Key Technique |
+|---|---|---|
+| 1 · Customer Churn | Predict churn → save revenue | XGBoost, feature importance |
+| 2 · Sales Pipeline | Visualise pipeline → close revenue | SQL window functions, Streamlit |
+| 3 · SaaS Expansion | Predict expansion → grow revenue | Logistic regression, SHAP |
+| **4 · Territory Planning** | **Plan territories → allocate resources** | **K-means, Gini coefficient** |
+
+Territory planning sits at the intersection of data and org design — translating account-level signals into rep coverage decisions that directly affect revenue capacity.
+
+---
+
+*Synthetic data only — no real company information.*
